@@ -1,0 +1,112 @@
+@extends('admin.layouts.main')
+
+@push('title')
+<title>Add Task - LindaBen CMS</title>
+@endpush
+
+@push('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #ced4da;
+        padding: 0.375rem 0.75rem;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #0d6efd;
+        border: 1px solid #0d6efd;
+        color: white;
+    }
+</style>
+@endpush
+
+@section('main-section')
+<div class="d-flex align-items-center justify-content-between page-header-breadcrumb flex-wrap gap-2">
+    <div>
+        <h3 class="dark">Add Task</h3>
+        <nav>
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.tasks.index') }}">Tasks</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Add</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="POST" action="{{ route('admin.tasks.store') }}">
+                        @csrf
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="title" name="title"
+                                    value="{{ old('title') }}" required>
+                                @error('title')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select class="form-select" id="priority" name="priority" required>
+                                    <option value="low" {{ old('priority') == 'low' ? 'selected' : '' }}>Low</option>
+                                    <option value="medium" {{ old('priority') == 'medium' ? 'selected' : '' }}>Medium</option>
+                                    <option value="high" {{ old('priority') == 'high' ? 'selected' : '' }}>High</option>
+                                </select>
+                                @error('priority')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
+                                @error('description')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label for="assigned_to" class="form-label">Assign to Volunteers (Optional)</label>
+                                <select class="form-control select2-multiple" id="assigned_to" name="assigned_to[]" multiple>
+                                    @foreach($volunteers as $volunteer)
+                                        <option value="{{ $volunteer->id }}" {{ in_array($volunteer->id, old('assigned_to', [])) ? 'selected' : '' }}>
+                                            {{ $volunteer->name }} ({{ $volunteer->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('assigned_to')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ri-save-line me-1"></i> Save
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('js')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2-multiple').select2({
+            placeholder: "Select volunteers",
+            allowClear: true
+        });
+    });
+</script>
+@endpush
